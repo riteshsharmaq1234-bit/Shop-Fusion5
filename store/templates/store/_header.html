@@ -1,0 +1,68 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'user_home' %}">ShopFusion</a>
+        <div class="d-flex align-items-center">
+
+            <!-- NEW DROPDOWN BUTTON -->
+            <div class="dropdown me-2">
+                <button class="btn btn-outline-light dropdown-toggle" 
+                        type="button" 
+                        id="usermenuDropdown" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false">
+                    Profile
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="usermenuDropdown">
+                    <li>
+                        <a class="dropdown-item" href="{% url 'track_order' %}">
+                            Track Order
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'user_profile' %}">
+                            Your Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="{% url 'about_us' %}">
+                            About Us
+                        </a>
+                    </li>
+                    <li>
+                        
+                    </li>
+                </ul>
+            </div>
+            <!-- END DROPDOWN BUTTON -->
+
+            <!-- Wishlist -->
+            <div class="dropdown me-2">
+                <button class="btn btn-outline-light position-relative" id="wishlistDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                    ❤️ <span id="wishlist-badge" class="badge bg-danger position-absolute" style="top:-6px;right:-8px;display:none">0</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="wishlistDropdownBtn" style="min-width:320px;">
+                    <li><h6 class="dropdown-header">Your Wishlist</h6></li>
+                    <li><div id="wishlist-dropdown-items" class="px-2">Loading…</div></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="px-2 text-end">
+                        <a href="{% url 'wishlist_page' %}" class="btn btn-sm btn-primary">View All</a>
+                    </li>
+                </ul>
+            </div>
+
+            {% if user.is_authenticated %}
+            <div class="me-2">
+                <a href="{% url 'my_orders' %}" class="btn btn-outline-info me-2">Orders</a>
+                <a href="{% url 'cart' %}" class="btn btn-light me-2">Cart</a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-light">Logout</a>
+            </div>
+            {% else %}
+            <div class="me-2">
+                <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Login</a>
+                <a href="{% url 'signup' %}" class="btn btn-primary">Sign Up</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</nav>

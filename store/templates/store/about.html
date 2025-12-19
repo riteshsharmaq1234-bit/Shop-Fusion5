@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About Us - ShopFusion</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .hero {
+      background: linear-gradient(135deg,#fdfbfb 0%,#ebedee 100%);
+      padding: 60px 0;
+    }
+    .hero .title { font-size: 2.5rem; font-weight: 700; }
+    .team-photo { width: 100%; height: 220px; object-fit: cover; border-radius: 8px; }
+    .blog-card img { height: 160px; object-fit: cover; }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+  <a class="navbar-brand" href="{% url 'user_home' %}">ShopFusion</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="nav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/home/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="/about/">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="/support/">Support</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="container text-center">
+      <h1 class="title">We create thoughtful fashion experiences</h1>
+      <p class="lead text-muted">ShopFusion curates clothing and accessories with a focus on sustainable materials and timeless design. We bring global styles to your doorstep.</p>
+      <div class="d-flex justify-content-center gap-3 mt-4">
+        <a href="/home" class="btn btn-primary">Shop Now</a>
+        <a href="/support/" class="btn btn-outline-secondary">Contact Support</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="container mt-5">
+    <div class="row">
+      <div class="col-md-6">
+        <h3>Our Mission</h3>
+        <p class="text-muted">To democratize high-quality fashion by connecting thoughtful designers with conscious shoppers. We prioritize transparency, fair production, and customer satisfaction.</p>
+        <ul>
+          <li>Curated collections</li>
+          <li>Ethical sourcing</li>
+          <li>Fast delivery and easy returns</li>
+        </ul>
+      </div>
+      <div class="col-md-6">
+        <h3>Why Shop With Us?</h3>
+        <p class="text-muted">We blend handpicked styles with modern e-commerce convenience — great images, fast checkout, and responsive customer care.</p>
+        <div class="row text-center mt-3">
+          <div class="col-4">
+            <h4>Free</h4>
+            <p class="small text-muted">Shipping over $50</p>
+          </div>
+          <div class="col-4">
+            <h4>Secure</h4>
+            <p class="small text-muted">Trusted payment options</p>
+          </div>
+          <div class="col-4">
+            <h4>Support</h4>
+            <p class="small text-muted">24/7 assistance</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container mt-5">
+    <h3 class="mb-4">Meet the Team</h3>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card">
+          <img class="team-photo" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=800&q=80&auto=format&fit=crop" alt="Team member">
+          <div class="card-body">
+            <h5 class="card-title">Alex Johnson</h5>
+            <p class="card-text small text-muted">Founder & CEO — Loves minimal design and great coffee.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <img class="team-photo" src="https://images.unsplash.com/photo-1545996124-1b3b7b2c8b6a?w=800&q=80&auto=format&fit=crop" alt="Team member">
+          <div class="card-body">
+            <h5 class="card-title">Priya Singh</h5>
+            <p class="card-text small text-muted">Head of Product — Passionate about UX and sustainability.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card">
+          <img class="team-photo" src="https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?w=800&q=80&auto=format&fit=crop" alt="Team member">
+          <div class="card-body">
+            <h5 class="card-title">Miguel Alvarez</h5>
+            <p class="card-text small text-muted">Operations Lead — Ensures everything ships on time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container mt-5">
+    <h3 class="mb-4">From Our Blog</h3>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card blog-card">
+          <img src="https://images.unsplash.com/photo-1514996937319-344454492b37?w=1200&q=80&auto=format&fit=crop" class="card-img-top" alt="blog 1">
+          <div class="card-body">
+            <h5 class="card-title">Sustainable Fabrics: What to Look For</h5>
+            <p class="card-text">A short guide to choosing eco-friendly materials without sacrificing style.</p>
+            <a href="#" class="btn btn-sm btn-primary">Read more</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card blog-card">
+          <img src="https://images.unsplash.com/photo-1495121605193-b116b5b09b63?w=1200&q=80&auto=format&fit=crop" class="card-img-top" alt="blog 2">
+          <div class="card-body">
+            <h5 class="card-title">How We Curate Our Collections</h5>
+            <p class="card-text">Behind the scenes of product selection and mindful curation.</p>
+            <a href="#" class="btn btn-sm btn-primary">Read more</a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card blog-card">
+          <img src="https://images.unsplash.com/photo-1520975911990-7d446f3d7b86?w=1200&q=80&auto=format&fit=crop" class="card-img-top" alt="blog 3">
+          <div class="card-body">
+            <h5 class="card-title">Timeless Wardrobe Staples</h5>
+            <p class="card-text">Tips to build a capsule wardrobe that lasts season after season.</p>
+            <a href="#" class="btn btn-sm btn-primary">Read more</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="mt-5 py-4 bg-dark text-light">
+    <div class="container text-center">
+      <small>© {{ now|date:"Y" }} ShopFusion — Crafted with care.</small>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

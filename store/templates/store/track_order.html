@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0c3fc 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .track-card {
+            max-width: 500px;
+            margin: 60px auto;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            border-radius: 18px;
+            padding: 32px 24px;
+            background: #f8fafc;
+        }
+        .track-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #22223b;
+            margin-bottom: 18px;
+        }
+        .status {
+            font-size: 1.2rem;
+            margin-top: 24px;
+        }
+        .order-info {
+            margin-top: 12px;
+            color: #4a4e69;
+        }
+        .sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 50%;
+            box-shadow: 0 0 12px 4px #fff, 0 0 24px 8px #e0c3fc;
+            animation: sparkle 2.5s infinite linear;
+        }
+        @keyframes sparkle {
+            0% { opacity: 0; transform: scale(0.5) translateY(0); }
+            50% { opacity: 1; transform: scale(1.2) translateY(-20px); }
+            100% { opacity: 0; transform: scale(0.5) translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Add 30 sparkles randomly
+        for(let i=0;i<30;i++){
+            let s=document.createElement('div');
+            s.className='sparkle';
+            s.style.left=Math.random()*100+'vw';
+            s.style.top=Math.random()*100+'vh';
+            s.style.animationDelay=(Math.random()*2.5)+'s';
+            document.body.appendChild(s);
+        }
+    </script>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'user_home' %}">ShopFusion</a>
+            <a href="{% url 'cart' %}" class="btn btn-light ms-3" title="Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16" style="margin-right:6px;">
+                    <path d="M0 1a1 1 0 0 1 1-1h1.11a1 1 0 0 1 .98.804L3.89 2H14a1 1 0 0 1 .98 1.196l-1.5 7A1 1 0 0 1 12.5 11H5a1 1 0 0 1-.98-.804L2.01 2.607 1.89 2H1a1 1 0 0 1-1-1z"/>
+                    <path d="M5.5 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                </svg>
+                Cart
+            </a>
+        </div>
+    </nav>
+    <div class="track-card">
+        <div class="track-title">Track Your Order</div>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Track</button>
+        </form>
+        {% if status %}
+            <div class="status">
+                <strong>Status:</strong> {{ status }}
+            </div>
+            {% if order %}
+            <div class="order-info">
+                <strong>Order #{{ order.id }}</strong><br>
+                Placed on: {{ order.created_at|date:'M d, Y H:i' }}<br>
+                Total: ${{ order.total }}
+            </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>

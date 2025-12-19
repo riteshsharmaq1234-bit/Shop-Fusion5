@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0c3fc 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 50%;
+            box-shadow: 0 0 12px 4px #fff, 0 0 24px 8px #e0c3fc;
+            animation: sparkle 2.5s infinite linear;
+        }
+        @keyframes sparkle {
+            0% { opacity: 0; transform: scale(0.5) translateY(0); }
+            50% { opacity: 1; transform: scale(1.2) translateY(-20px); }
+            100% { opacity: 0; transform: scale(0.5) translateY(0); }
+        }
+        .address-card {
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            border-radius: 18px;
+            padding: 32px 24px;
+            background: #f8fafc;
+            margin-top: 32px;
+        }
+        .address-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #22223b;
+            margin-bottom: 18px;
+        }
+        .form-label { font-weight: 500; }
+    </style>
+</head>
+<body>
+    <script>
+        // Add 30 sparkles randomly
+        for(let i=0;i<30;i++){
+            let s=document.createElement('div');
+            s.className='sparkle';
+            s.style.left=Math.random()*100+'vw';
+            s.style.top=Math.random()*100+'vh';
+            s.style.animationDelay=(Math.random()*2.5)+'s';
+            document.body.appendChild(s);
+        }
+    </script>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'user_home' %}">E-Commerce</a>
+            <div class="d-flex align-items-center">
+                <div class="dropdown me-2">
+                    <button class="btn btn-outline-light position-relative" id="wishlistDropdownBtnCart" data-bs-toggle="dropdown" aria-expanded="false">
+                        ❤️ <span id="wishlist-badge-cart" class="badge bg-danger position-absolute" style="top:-6px;right:-8px;display:none">0</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="wishlistDropdownBtnCart" style="min-width:320px;">
+                        <li><h6 class="dropdown-header">Your Wishlist</h6></li>
+                        <li><div id="wishlist-dropdown-items-cart" class="px-2">Loading…</div></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="px-2 text-end"><a href="{% url 'wishlist_page' %}" class="btn btn-sm btn-primary">View All</a></li>
+                    </ul>
+                </div>
+                <a href="{% url 'cart' %}" class="btn btn-light" title="Go to Cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="margin-right:6px;">
+                        <path d="M0 1a1 1 0 0 1 1-1h1.11a1 1 0 0 1 .98.804L3.89 2H14a1 1 0 0 1 .98 1.196l-1.5 7A1 1 0 0 1 12.5 11H5a1 1 0 0 1-.98-.804L2.01 2.607 1.89 2H1a1 1 0 0 1-1-1z"/>
+                        <path d="M5.5 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                    </svg>
+                    Cart
+                </a>
+            </div>
+        </div>
+    </nav>
+    <script>
+        async function fetchWishlistAndRenderCart(){
+            try{
+                const resp = await fetch('/api/wishlist/');
+                const json = await resp.json();
+                const container = document.getElementById('wishlist-dropdown-items-cart');
+                const badge = document.getElementById('wishlist-badge-cart');
+                if(!json.ok){ container.innerHTML = '<div class="text-muted">Sign in to see wishlist</div>'; badge.style.display='none'; return; }
+                const items = json.items || [];
+                if(items.length === 0){ container.innerHTML = '<div class="text-muted">No items in wishlist</div>'; badge.style.display='none'; return; }
+                badge.style.display = 'inline-block'; badge.textContent = items.length;
+                let html = '<div>';
+                for(const it of items.slice(0,5)){
+                    html += `<div class="d-flex align-items-center mb-2"><img src="${it.image}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;margin-right:8px"><div class="flex-grow-1"><div style="font-weight:600">${it.name}</div><div class="text-muted small">$${it.price}</div></div><a href="/product/${it.id}/" class="btn btn-sm btn-outline-primary ms-2">View</a></div>`;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            }catch(e){ console.error(e); }
+        }
+        document.addEventListener('DOMContentLoaded', fetchWishlistAndRenderCart);
+    </script>
+    <div class="container mt-4">
+        <h1>Your Cart</h1>
+        {% if cart_items %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Subtotal</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td><span class="badge bg-secondary">{{ item.size }}</span></td>
+                    <td>
+                        <form method="post" action="{% url 'update_cart_item' item.id %}" class="d-flex align-items-center">
+                            {% csrf_token %}
+                            <select name="quantity" class="form-select form-select-sm w-auto me-2" onchange="if(this.value==11){this.style.display='none';this.nextElementSibling.style.display='inline-block';this.nextElementSibling.focus();}">
+                                {% for i in quantity_range %}
+                                    <option value="{{ i }}" {% if item.quantity == i %}selected{% endif %}>{{ i }}</option>
+                                {% endfor %}
+                                <option value="11" {% if item.quantity > 10 %}selected{% endif %}>10+</option>
+                            </select>
+                            <input type="number" name="manual_quantity" min="11" max="999" value="{% if item.quantity > 10 %}{{ item.quantity }}{% endif %}" class="form-control form-control-sm w-auto me-2" style="display:{% if item.quantity > 10 %}inline-block{% else %}none{% endif %};" onblur="if(this.value <= 10){this.style.display='none';this.previousElementSibling.style.display='inline-block';this.previousElementSibling.value=this.value;}">
+                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                        </form>
+                    </td>
+                    <td>${{ item.product.price }}</td>
+                    <td>${{ item.subtotal }}</td>
+                    <td>
+                        <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-danger btn-sm">Remove</a>
+                        <button class="btn btn-secondary btn-sm save-for-later" data-item-id="{{ item.id }}">Save for later</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>Total: ${{ total }}</h3>
+        <form method="post">
+            {% csrf_token %}
+            <div class="address-card">
+                <div class="address-title">Shipping Address</div>
+                {{ address_form.as_p }}
+            </div>
+            <button type="submit" class="btn btn-success btn-lg mt-4">Place Order</button>
+        </form>
+        {% else %}
+        <p>Your cart is empty.</p>
+        {% endif %}
+    </div>
+        <script>
+        function getCookie(name) {
+                const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+                return v ? v.pop() : '';
+        }
+        async function postJSON(url, data){
+            const csrftoken = (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value || getCookie('csrftoken');
+            const resp = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken': csrftoken}, body: JSON.stringify(data)});
+            return resp.json();
+        }
+        document.addEventListener('click', function(e){
+            if(e.target.matches('.save-for-later')){
+                const itemId = e.target.dataset.itemId;
+                // fetch item details via simple pattern: we assume server knows user cart
+                // Call endpoint to move cart item to wishlist
+                postJSON('/api/wishlist/move-to-cart/', {product_id: null}).then(r=>{ /* no-op */ });
+                // For now redirect to wishlist after form submit to ensure server sync
+                // We'll instead submit a small POST form to server endpoint to move by cart item id
+                const form = document.createElement('form');
+                form.method='post'; form.action='/save-for-later/';
+                const csr = document.querySelector('[name=csrfmiddlewaretoken]');
+                if(csr){ const i=document.createElement('input'); i.type='hidden'; i.name='csrfmiddlewaretoken'; i.value=csr.value; form.appendChild(i); }
+                const i2=document.createElement('input'); i2.type='hidden'; i2.name='cart_item_id'; i2.value=itemId; form.appendChild(i2);
+                document.body.appendChild(form); form.submit();
+            }
+        });
+        </script>
+</body>
+</html>

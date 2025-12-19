@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #f8fafc 0%, #e0c3fc 100%); min-height: 100vh; }
+        .order-card { box-shadow: 0 4px 24px rgba(0,0,0,0.08); border-radius: 18px; background: #fff; margin: 2rem auto; max-width: 600px; }
+        .order-header { background: #a18cd1; color: #fff; border-radius: 18px 18px 0 0; padding: 1rem 1.5rem; }
+        .order-body { padding: 1.5rem; }
+        .order-item { border-bottom: 1px solid #eee; padding: 0.5rem 0; }
+        .order-item:last-child { border-bottom: none; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'user_home' %}">ShopFusion</a>
+            <a href="{% url 'logout' %}?next=/" class="btn btn-outline-light">Logout</a>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="order-card">
+            <div class="order-header">
+                <strong>Order ID:</strong> #{{ order.id }} &nbsp; | &nbsp;
+                <strong>Date:</strong> {{ order.created_at|date:"Y-m-d H:i" }} &nbsp; | &nbsp;
+                <strong>Status:</strong> {{ order.tracking_status }}
+            </div>
+            <div class="order-body">
+                <div class="mb-3"><strong>Shipping Address:</strong><br>
+                    {{ order.address.address_line }}, {{ order.address.city }}, {{ order.address.state }}, {{ order.address.postal_code }}, {{ order.address.country }}
+                </div>
+                <div class="mb-3"><strong>Items:</strong>
+                    <ul class="list-unstyled mb-2">
+                        {% for item in order.order_items.all %}
+                        <li class="order-item d-flex align-items-center gap-3">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width:60px; height:60px; object-fit:cover; border-radius:8px; border:1px solid #eee;">
+                            {% endif %}
+                            <div>
+                                <strong>{{ item.product.name }}</strong> &times; {{ item.quantity }}<br>
+                                <span>Price: ${{ item.price }}</span><br>
+                                <span>Specification: {{ item.product.specification }}</span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div><strong>Total:</strong> ${{ order.total }}</div>
+                <div class="mt-4">
+                    <a href="{% url 'track_order' %}" class="btn btn-outline-primary">Track Order</a>
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'my_orders' %}" class="btn btn-secondary mt-3">Back to My Orders</a>
+    </div>
+</body>
+</html>

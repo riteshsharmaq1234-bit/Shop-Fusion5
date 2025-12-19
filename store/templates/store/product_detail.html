@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0c3fc 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 50%;
+            box-shadow: 0 0 12px 4px #fff, 0 0 24px 8px #e0c3fc;
+            animation: sparkle 2.5s infinite linear;
+        }
+        @keyframes sparkle {
+            0% { opacity: 0; transform: scale(0.5) translateY(0); }
+            50% { opacity: 1; transform: scale(1.2) translateY(-20px); }
+            100% { opacity: 0; transform: scale(0.5) translateY(0); }
+        }
+        .product-card {
+            margin-top: 40px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            border-radius: 24px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .product-image {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            background: #f8fafc;
+        }
+        .product-info {
+            padding: 32px 24px;
+        }
+        .product-title {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #22223b;
+        }
+        .product-spec {
+            color: #4a4e69;
+            margin: 18px 0 24px 0;
+        }
+        .product-price {
+            font-size: 1.5rem;
+            color: #c1121f;
+            font-weight: bold;
+            margin-bottom: 24px;
+        }
+        .btn-add {
+            font-size: 1.2rem;
+            padding: 12px 36px;
+            border-radius: 30px;
+        }
+        @media (max-width: 800px) {
+            .product-info { padding: 18px 8px; }
+            .product-title { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Add 30 sparkles randomly
+        for(let i=0;i<30;i++){
+            let s=document.createElement('div');
+            s.className='sparkle';
+            s.style.left=Math.random()*100+'vw';
+            s.style.top=Math.random()*100+'vh';
+            s.style.animationDelay=(Math.random()*2.5)+'s';
+            document.body.appendChild(s);
+        }
+    </script>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'user_home' %}">ShopFusion</a>
+            <div class="d-flex align-items-center">
+                <div class="dropdown me-2">
+                    <button class="btn btn-outline-light position-relative" id="wishlistDropdownBtnPD" data-bs-toggle="dropdown" aria-expanded="false">
+                        ❤️ <span id="wishlist-badge-pd" class="badge bg-danger position-absolute" style="top:-6px;right:-8px;display:none">0</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end p-2" aria-labelledby="wishlistDropdownBtnPD" style="min-width:320px;">
+                        <li><h6 class="dropdown-header">Your Wishlist</h6></li>
+                        <li><div id="wishlist-dropdown-items-pd" class="px-2">Loading…</div></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li class="px-2 text-end"><a href="{% url 'wishlist_page' %}" class="btn btn-sm btn-primary">View All</a></li>
+                    </ul>
+                </div>
+                <a href="{% url 'cart' %}" class="btn btn-light" title="Go to Cart">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="margin-right:6px;">
+                        <path d="M0 1a1 1 0 0 1 1-1h1.11a1 1 0 0 1 .98.804L3.89 2H14a1 1 0 0 1 .98 1.196l-1.5 7A1 1 0 0 1 12.5 11H5a1 1 0 0 1-.98-.804L2.01 2.607 1.89 2H1a1 1 0 0 1-1-1z"/>
+                        <path d="M5.5 12a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+                    </svg>
+                    Cart
+                </a>
+            </div>
+        </div>
+    </nav>
+    <script>
+        async function fetchWishlistAndRenderPD(){
+            try{
+                const resp = await fetch('/api/wishlist/');
+                const json = await resp.json();
+                const container = document.getElementById('wishlist-dropdown-items-pd');
+                const badge = document.getElementById('wishlist-badge-pd');
+                if(!json.ok){ container.innerHTML = '<div class="text-muted">Sign in to see wishlist</div>'; badge.style.display='none'; return; }
+                const items = json.items || [];
+                if(items.length === 0){ container.innerHTML = '<div class="text-muted">No items in wishlist</div>'; badge.style.display='none'; return; }
+                badge.style.display = 'inline-block'; badge.textContent = items.length;
+                let html = '<div>';
+                for(const it of items.slice(0,5)){
+                    html += `<div class="d-flex align-items-center mb-2"><img src="${it.image}" style="width:48px;height:48px;object-fit:cover;border-radius:6px;margin-right:8px"><div class="flex-grow-1"><div style="font-weight:600">${it.name}</div><div class="text-muted small">$${it.price}</div></div><a href="/product/${it.id}/" class="btn btn-sm btn-outline-primary ms-2">View</a></div>`;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            }catch(e){ console.error(e); }
+        }
+        document.addEventListener('DOMContentLoaded', fetchWishlistAndRenderPD);
+    </script>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="product-card row g-0">
+                    <div class="col-md-6">
+                        <img src="{{ product.image.url }}" class="product-image" alt="{{ product.name }}">
+                    </div>
+                    <div class="col-md-6 d-flex align-items-center">
+                        <div class="product-info w-100">
+                            <div class="product-title">{{ product.name }}</div>
+                            <div class="product-spec">{{ product.specification }}</div>
+                            <div class="product-price">${{ product.price }}</div>
+                            <div class="mb-2">
+                                <button id="wishlist-btn" class="btn btn-outline-danger btn-sm" aria-pressed="false" data-product-id="{{ product.id }}">
+                                    <span class="wish-icon">♡</span>
+                                    <span class="wish-text">Add to Wishlist</span>
+                                </button>
+                            </div>
+                            <div class="mb-2">Available: <strong>{{ product.total_stock }}</strong> units</div>
+                            {% if user.is_authenticated %}
+                                <form action="{% url 'add_to_cart' product.pk %}" method="post" class="d-flex align-items-center">
+                                    {% csrf_token %}
+                                    <div class="me-2">
+                                        <label class="form-label mb-1">Size</label>
+                                        <select name="size" class="form-select">
+                                            {% for s in product.sizestock_set.all %}
+                                                <option value="{{ s.size }}" {% if s.stock == 0 %}disabled{% endif %}>
+                                                    {{ s.size }} {% if s.stock == 0 %}(Out){% else %}({{ s.stock }}){% endif %}
+                                                </option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="me-2" style="width:90px;">
+                                        <label class="form-label mb-1">Qty</label>
+                                        <input type="number" name="quantity" min="1" value="1" class="form-control">
+                                    </div>
+                                    <div>
+                                        <button type="submit" class="btn btn-success btn-add">Add to Cart</button>
+                                    </div>
+                                </form>
+                            {% else %}
+                                <a href="/admin/login/?next={% url 'product_detail' product.pk %}" class="btn btn-secondary btn-add">Login to Add to Cart</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+                function getCookie(name) {
+                        const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+                        return v ? v.pop() : '';
+                }
+                async function postJSON(url, data){
+                    const csrftoken = (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value || getCookie('csrftoken');
+                    const resp = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json','X-CSRFToken': csrftoken}, body: JSON.stringify(data)});
+                    return resp.json();
+                }
+        (function(){
+            const btn = document.getElementById('wishlist-btn');
+            if(!btn) return;
+            const pid = btn.dataset.productId || {{ product.id }};
+            // helper to update navbar badges in page
+            async function refreshWishlistBadges(){
+                try{
+                    const resp = await fetch('/api/wishlist/');
+                    const j = await resp.json();
+                    const count = (j.ok && j.items) ? j.items.length : 0;
+                    const b1 = document.getElementById('wishlist-badge-pd');
+                    const b2 = document.getElementById('wishlist-badge');
+                    if(b1){ if(count>0){ b1.style.display='inline-block'; b1.textContent = count; } else b1.style.display='none'; }
+                    if(b2){ if(count>0){ b2.style.display='inline-block'; b2.textContent = count; } else b2.style.display='none'; }
+                }catch(e){ /* ignore */ }
+            }
+
+            function showToast(message){
+                const t = document.createElement('div');
+                t.className = 'toast-notice';
+                t.style = 'position:fixed;right:20px;bottom:20px;padding:10px 14px;background:#0d6efd;color:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(16,24,40,0.2);z-index:9999;opacity:0;transition:opacity .2s,transform .2s';
+                t.textContent = message;
+                document.body.appendChild(t);
+                requestAnimationFrame(()=>{ t.style.opacity=1; t.style.transform='translateY(-6px)'; });
+                setTimeout(()=>{ t.style.opacity=0; t.style.transform='translateY(0px)'; setTimeout(()=>t.remove(),300); }, 1800);
+            }
+
+            async function setState(isWishlisted){
+                btn.disabled = false;
+                btn.setAttribute('aria-pressed', isWishlisted ? 'true' : 'false');
+                const icon = btn.querySelector('.wish-icon');
+                const text = btn.querySelector('.wish-text');
+                if(isWishlisted){ icon.textContent = '❤️'; text.textContent = 'Wishlisted'; btn.classList.remove('btn-outline-danger'); btn.classList.add('btn-danger'); }
+                else { icon.textContent = '♡'; text.textContent = 'Add to Wishlist'; btn.classList.remove('btn-danger'); btn.classList.add('btn-outline-danger'); }
+                await refreshWishlistBadges();
+            }
+
+            async function fetchStatus(){
+                try{
+                    const resp = await fetch('/api/wishlist/status/?product_id='+encodeURIComponent(pid));
+                    const j = await resp.json();
+                    if(j.ok){ await setState(Boolean(j.is_wishlisted)); }
+                }catch(e){ console.error(e); }
+            }
+
+            btn.addEventListener('click', async function(){
+                btn.disabled = true;
+                const currently = btn.getAttribute('aria-pressed') === 'true';
+                try{
+                    if(currently){
+                        const res = await postJSON('/api/wishlist/remove/', {product_id: pid});
+                        if(res.ok){ await setState(false); showToast('Removed from wishlist'); }
+                        else if(res.login_required){ await postJSON('/api/wishlist/guest/', {items: []}); await setState(false); showToast('Removed from wishlist'); }
+                        else alert(res.error || 'Could not remove');
+                    } else {
+                        const res = await postJSON('/api/wishlist/add/', {product_id: pid});
+                        if(res.ok){ await setState(true); showToast('Added to wishlist'); }
+                        else if(res.login_required){ // guest flow
+                            let arr = JSON.parse(localStorage.getItem('guest_wishlist') || '[]'); if(!arr.includes(Number(pid))) arr.push(Number(pid)); localStorage.setItem('guest_wishlist', JSON.stringify(arr)); try{ await postJSON('/api/wishlist/guest/', {items: arr}); }catch(e){} await setState(true); showToast('Added to wishlist'); }
+                        else alert(res.error || 'Could not add');
+                    }
+                }catch(e){ console.error(e); }
+                btn.disabled = false;
+            });
+
+            // initial load
+            fetchStatus();
+            // respond to changes from other tabs/components
+            window.addEventListener('storage', function(ev){ if(ev.key === 'wishlist_updated'){ fetchStatus(); } });
+        })();
+    </script>
+</body>
+</html>

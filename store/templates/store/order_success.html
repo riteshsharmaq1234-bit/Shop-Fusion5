@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Placed</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0c3fc 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        .sparkle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 50%;
+            box-shadow: 0 0 12px 4px #fff, 0 0 24px 8px #e0c3fc;
+            animation: sparkle 2.5s infinite linear;
+        }
+        @keyframes sparkle {
+            0% { opacity: 0; transform: scale(0.5) translateY(0); }
+            50% { opacity: 1; transform: scale(1.2) translateY(-20px); }
+            100% { opacity: 0; transform: scale(0.5) translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // Add 30 sparkles randomly
+        for(let i=0;i<30;i++){
+            let s=document.createElement('div');
+            s.className='sparkle';
+            s.style.left=Math.random()*100+'vw';
+            s.style.top=Math.random()*100+'vh';
+            s.style.animationDelay=(Math.random()*2.5)+'s';
+            document.body.appendChild(s);
+        }
+    </script>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'user_home' %}">ShopFusion</a>
+        </div>
+    </nav>
+        <div class="container mt-5 text-center">
+                <h1 class="text-success">Thank you for your order!</h1>
+                <p>Your order #{{ order.id }} has been placed successfully.</p>
+                <a href="{% url 'user_home' %}" class="btn btn-primary mt-3">Back to Home</a>
+        </div>
+
+        {% if show_order_id_modal %}
+        <!-- Order ID Modal -->
+        <div class="modal fade" id="orderIdModal" tabindex="-1" aria-labelledby="orderIdModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="orderIdModalLabel">Order Placed!</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Your Order ID is <strong>#{{ order.id }}</strong>.<br>
+                        Please save this ID to track your order.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            window.addEventListener('DOMContentLoaded', function() {
+                var orderIdModal = new bootstrap.Modal(document.getElementById('orderIdModal'));
+                orderIdModal.show();
+            });
+        </script>
+        {% endif %}
+</body>
+</html>

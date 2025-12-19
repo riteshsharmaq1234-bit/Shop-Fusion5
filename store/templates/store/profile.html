@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #f8fafc 0%, #e0c3fc 100%); min-height: 100vh; }
+        .profile-card { margin-top: 60px; }
+    </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'user_home' %}">ShopFusion</a>
+            <div class="d-flex align-items-center">
+                <a href="{% url 'my_orders' %}" class="btn btn-outline-info me-2">My Orders</a>
+                <a href="{% url 'logout' %}" class="btn btn-outline-light me-2">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container profile-card">
+      <div class="row">
+        <div class="col-md-8 offset-md-2">
+          <div class="card">
+            <div class="card-header">
+              <h4>Profile</h4>
+            </div>
+            <div class="card-body">
+              <p><strong>Username:</strong> {{ profile_user.username }}</p>
+
+              {% if profile_user.email %}
+              <p><strong>Email:</strong> {{ profile_user.email }}</p>
+              {% endif %}
+
+              <p><strong>Date joined:</strong> {{ profile_user.date_joined }}</p>
+
+              <h5 class="mt-4">Addresses</h5>
+              {% if addresses %}
+                <ul class="list-group">
+                  {% for addr in addresses %}
+                    <li class="list-group-item">
+                      {{ addr.address_line }}, {{ addr.city }}, {{ addr.state }},
+                      {{ addr.postal_code }}, {{ addr.country }}
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p>No addresses found.</p>
+              {% endif %}
+
+              <h5 class="mt-4">Recent Orders</h5>
+              {% if recent_orders %}
+                <ul class="list-group">
+                  {% for o in recent_orders %}
+                    <li class="list-group-item">
+                      Order #{{ o.id }} - {{ o.created_at }} - {{ o.tracking_status }} - Total: {{ o.total }}
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <p>No orders found.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
