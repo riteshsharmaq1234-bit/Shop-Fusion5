@@ -204,48 +204,42 @@ def product_list(request, category_name):
     products = Product.objects.filter(category=category)
     return render(request, 'store/product_list.html', {'category': category, 'products': products})
 
-# Product detail view
-
 def product_detail(request, pk):
     product = get_object_or_404(Product, pk=pk)
     return render(request, 'store/product_detail.html', {'product': product})
 
-# Add to cart
 def add_to_cart(request, pk):
-    shop_user = request.shop_user if getattr(request, 'shop_user', None) else (request.user if request.user.is_authenticated else None)
-    if not shop_user:
-        return redirect('login')
-    product = get_object_or_404(Product, pk=pk)
-
     if request.method != 'POST':
         return redirect('product_detail', pk=pk)
-
+    shop_user = request.shop_user if getattr(request, 'shop_user', None) else (request.user if request.user.is_authenticated else None)
+    product = get_object_or_404(Product, pk=pk)
     size = request.POST.get('size')
     try:
         qty = int(request.POST.get('quantity', '1'))
     except Exception:
         qty = 1
-
+    if not shop_user:
+        request.session['cart_intent'] = {
+            'product_id': product.id,
+            'size': size,
+            'quantity': qty,
+        }
+        return redirect('login')
     if size not in dict(CartItem.SIZE_CHOICES):
         messages.error(request, 'Please select a valid size.')
         return redirect('product_detail', pk=pk)
-
-    # Prevent adding more than available stock for the selected size
     try:
         size_row = SizeStock.objects.get(product=product, size=size)
     except SizeStock.DoesNotExist:
         messages.error(request, 'Size information not available for this product.')
         return redirect('product_detail', pk=pk)
-
     existing_qty = 0
     existing = CartItem.objects.filter(user=shop_user, product=product, size=size).first()
     if existing:
         existing_qty = existing.quantity
-
     if size_row.stock < existing_qty + qty:
         messages.error(request, f'Insufficient stock for size {size}. Available: {size_row.stock - existing_qty}')
         return redirect('product_detail', pk=pk)
-
     cart_item, created = CartItem.objects.get_or_create(user=shop_user, product=product, size=size)
     if not created:
         cart_item.quantity += qty
@@ -382,19 +376,16 @@ class StoreLoginView(LoginView):
     success_url = reverse_lazy('user_home')
 
     def form_valid(self, form):
-        # Log in the user using Django's auth system and keep custom session keys for compatibility
         user = form.get_user()
         try:
             login(self.request, user)
         except Exception:
-            # If Django login fails for some reason, continue to set session keys
             pass
         self.request.session['shop_user_authenticated'] = True
         self.request.session['shop_user_id'] = user.id
         self.request.session['shop_user_username'] = user.username
         self.request.session['shop_user_email'] = user.email
         self.request.session['shop_user_date_joined'] = str(user.date_joined)
-        # Merge guest wishlist from session into user wishlist on login
         guest_wishlist = self.request.session.pop('guest_wishlist', None)
         if guest_wishlist and isinstance(guest_wishlist, list):
             for pid in guest_wishlist:
@@ -407,6 +398,37 @@ class StoreLoginView(LoginView):
                 except Product.DoesNotExist:
                     continue
                 Wishlist.objects.get_or_create(user=user, product=prod)
+        cart_intent = self.request.session.pop('cart_intent', None)
+        if cart_intent:
+            try:
+                product_id = int(cart_intent.get('product_id'))
+                quantity = int(cart_intent.get('quantity') or 1)
+            except Exception:
+                return redirect('cart')
+            size = cart_intent.get('size')
+            try:
+                product = Product.objects.get(pk=product_id)
+            except Product.DoesNotExist:
+                return redirect('cart')
+            if size not in dict(CartItem.SIZE_CHOICES):
+                return redirect('cart')
+            try:
+                size_row = SizeStock.objects.get(product=product, size=size)
+            except SizeStock.DoesNotExist:
+                return redirect('cart')
+            existing_qty = 0
+            existing = CartItem.objects.filter(user=user, product=product, size=size).first()
+            if existing:
+                existing_qty = existing.quantity
+            if size_row.stock < existing_qty + quantity:
+                return redirect('cart')
+            cart_item, created = CartItem.objects.get_or_create(user=user, product=product, size=size)
+            if not created:
+                cart_item.quantity += quantity
+            else:
+                cart_item.quantity = quantity
+            cart_item.save()
+            return redirect('user_home')
         return redirect(self.get_success_url())
 
 

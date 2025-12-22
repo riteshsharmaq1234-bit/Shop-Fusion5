@@ -147,30 +147,28 @@
                                 </button>
                             </div>
                             <div class="mb-2">Available: <strong>{{ product.total_stock }}</strong> units</div>
-                            {% if user.is_authenticated %}
-                                <form action="{% url 'add_to_cart' product.pk %}" method="post" class="d-flex align-items-center">
-                                    {% csrf_token %}
-                                    <div class="me-2">
-                                        <label class="form-label mb-1">Size</label>
-                                        <select name="size" class="form-select">
-                                            {% for s in product.sizestock_set.all %}
-                                                <option value="{{ s.size }}" {% if s.stock == 0 %}disabled{% endif %}>
-                                                    {{ s.size }} {% if s.stock == 0 %}(Out){% else %}({{ s.stock }}){% endif %}
-                                                </option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
-                                    <div class="me-2" style="width:90px;">
-                                        <label class="form-label mb-1">Qty</label>
-                                        <input type="number" name="quantity" min="1" value="1" class="form-control">
-                                    </div>
-                                    <div>
-                                        <button type="submit" class="btn btn-success btn-add">Add to Cart</button>
-                                    </div>
-                                </form>
-                            {% else %}
-                                <a href="/admin/login/?next={% url 'product_detail' product.pk %}" class="btn btn-secondary btn-add">Login to Add to Cart</a>
-                            {% endif %}
+                            <form action="{% url 'add_to_cart' product.pk %}" method="post" class="d-flex align-items-center">
+                                {% csrf_token %}
+                                <div class="me-2">
+                                    <label class="form-label mb-1">Size</label>
+                                    <select name="size" class="form-select">
+                                        {% for s in product.sizestock_set.all %}
+                                            <option value="{{ s.size }}" {% if s.stock == 0 %}disabled{% endif %}>
+                                                {{ s.size }} {% if s.stock == 0 %}(Out){% else %}({{ s.stock }}){% endif %}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="me-2" style="width:90px;">
+                                    <label class="form-label mb-1">Qty</label>
+                                    <input type="number" name="quantity" min="1" value="1" class="form-control">
+                                </div>
+                                <div>
+                                    <button type="submit" class="btn btn-success btn-add">
+                                        {% if user.is_authenticated %}Add to Cart{% else %}Login to Add to Cart{% endif %}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
