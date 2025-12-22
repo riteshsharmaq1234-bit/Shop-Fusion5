@@ -20,13 +20,24 @@
 </head>
 
 <body>
-{% include 'store/_header.html' %}
 
-<div class="container py-4">
-  <div class="d-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0">Your Wishlist</h1>
-    <a class="btn btn-outline-primary" href="{% url 'user_home' %}">Continue Shopping</a>
-  </div>
+
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container-fluid">
+        <!-- Left: Page Title -->
+        <span class="navbar-brand mb-0 h1">
+            Your Wishlist
+        </span>
+
+        <!-- Right: Continue Shopping -->
+        <a href="{% url 'user_home' %}"
+           class="btn btn-outline-primary">
+            ← Continue Shopping
+        </a>
+
+    </div>
+</nav>
+
 
   {% if items %}
   <div class="row g-3">
